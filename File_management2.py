@@ -25,17 +25,29 @@ def createfolders(element, path):
         (filepath, filename) = os.path.split(intensity)
         (shortname, extension) = os.path.splitext(filename)
 
+        master = r""
+
+        ##Make sure to rename master to the folder where you will be placing things
         directory = master + "\\{}.shortname"
 
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-def movefiles(filelocation, dir):
-    main = "write the main directory where this shit is"
-    directory = "write whereever it is going"
+#using os.walk to move files from one location to another
+def movefiles(dir, newdir):
+    dir = "write the main directory where this shit is"
+    newdir = "write whereever it is going"
 
-    for filelocation in os.walk(dir):
-        ##when using os walk, we'll get a root file, subdirectoriesm and the the files within the subdirectories
-        print('root', root)
-        print('subdirs', subdirs)
-        print('files', files)
+    for dirpath, dirnames, filenames in os.walk(dir):
+        ##os.walk will yield a tuple when using, for each file that it see's, you'll see the directory path, the directories within that path, and then the files in that path. 
+        print('path:', dirpath)
+        print('directories:', dirnames)
+        print('files:', filenames)
+
+        #this does not copy files, only moves from one location to the newdir
+        for file in filenames:
+            path = os.path.join(path, file)
+            shutil.move(path, newdir)
+
+
+
