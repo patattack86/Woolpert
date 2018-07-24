@@ -1,3 +1,5 @@
+#function performs ndvi on raster image, then performs kmeans clustering on image, then exports the kmeans as a geotiff.
+
 getwd()
 
 rast_image = "M:\\GS\\Projects\\09001_ISM_P3\\RemoteSensing\\WORKSPACE\\Xenia\\BS567608.tif"
