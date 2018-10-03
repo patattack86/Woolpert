@@ -1,2 +1,2 @@
 # Woolpert
-convert Intensities and nDSM into eCog tile processing format
+Just a bunch of scripts that automate things I have to do more than once
