@@ -1,5 +1,3 @@
-####I am not sure if this works all the way through yet, just want to save this chit brahs
-
 import os, shutil, time, glob, sys
 from shutil import copyfile
 import arcpy
@@ -13,10 +11,6 @@ eCog_Folder = r"B:\Florida-Hydro\Florida-Ecog"
 #Empty lists which the vector data will stored in until merged
 Raw_Vect = []
 Smooth_Vect = []
-
-#Empy list containing individual nDSM and Intensity files 
-nDSM = []
-Intensity = []
 
 #Path where the merged vectors will be stored
 Raw_merge = r"B:\Florida-Hydro\Final_Merged_Vectors\Raw_Merged.shp"
@@ -44,23 +38,34 @@ for subdir, dirs, files in os.walk(Vec_Folder):
         elif shortname == "Hydro_smoothed":
             Smooth_Vect.append(os.path.join(subdir,file))
 
-arcpy.Merge_management(Raw_Vect, Raw_merge)
-arcpy.Merge_management(Smooth_Vect, Smooth_merge)
+#arcpy.Merge_management(Raw_Vect, Raw_merge)
+#arcpy.Merge_management(Smooth_Vect, Smooth_merge)
 
 #This second section is constructed to merge the raster files (Intensity & nDSM) if they exist in the
 # vector files. Honestly, this should be turned into classes with inheritence but fuckit
-for subdir, dirs, files in os.walk(eCog_Folder):
+folder_names = []
+for subdir, dirs, files in os.walk(Vec_Folder):
     for file in files:
         (filepath, filename) = os.path.split(file)
         (shortname, extension) = os.path.splitext(filename)
+        (path, foldername) = os.path.split(subdir)
+        folder_names.append(foldername)
 
-        if filename in Raw_Vect == True:
-            if (extension != ".tif"):
-                continue
-            if shortname == "nDSM":
-                nDSM.append(os.path.join(subdir,file))
-            elif shortname == "Intensity":
-                Intensity.append(os.path.join(subdir,file))
+#Empy list containing individual nDSM and Intensity files 
+nDSM = []
+Intensity = []
+Projection = ""
 
-arcpy.MosaicToNewRaster_management(Intensity, Intensity_path, Intensity_file)
-arcpy.MosaicToNewRaster_management(nDSM, nDSM_path, nDSM_file)
+for subdir, dirs, files in os.walk(eCog_Folder):
+    for dir in dirs:
+        if dir in folder_names:
+            ndsm_file = "{}\\{}\\nDSM.tif".format(eCog_Folder, dir)
+            intensity_file = "{}\\{}\\Intensity.tif".format(eCog_Folder, dir)
+            if ndsm_file not in nDSM:
+                nDSM.append(ndsm_file)
+            if intensity_file not in Intensity:
+                Intensity.append(intensity_file)
+
+
+arcpy.MosaicToNewRaster_management(Intensity, Intensity_path, Intensity_file, "1")
+arcpy.MosaicToNewRaster_management(nDSM, nDSM_path, nDSM_file, "1")
