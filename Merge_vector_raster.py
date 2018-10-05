@@ -54,6 +54,38 @@ for subdir, dirs, files in os.walk(Vec_Folder):
 #Empy list containing individual nDSM and Intensity files 
 nDSM = []
 Intensity = []
+projection = "102658"
+
+for subdir, dirs, files in os.walk(eCog_Folder):
+    for dir in dirs:
+        if dir in folder_names:
+            ndsm_file = "{}\\{}\\nDSM.tif".format(eCog_Folder, dir)
+            intensity_file = "{}\\{}\\Intensity.tif".format(eCog_Folder, dir)
+            if ndsm_file not in nDSM:
+                nDSM.append(ndsm_file)
+            if intensity_file not in Intensity:
+                Intensity.append(intensity_file)
+
+
+arcpy.MosaicToNewRaster_management(Intensity, Intensity_path, Intensity_file, projection,"8_BIT_UNSIGNED", "1", "1", "First")
+arcpy.MosaicToNewRaster_management(nDSM, nDSM_path, nDSM_file, projection, "8_BIT_UNSIGNED", "1", "1", "First")
+
+#arcpy.Merge_management(Raw_Vect, Raw_merge)
+#arcpy.Merge_management(Smooth_Vect, Smooth_merge)
+
+#This second section is constructed to merge the raster files (Intensity & nDSM) if they exist in the
+# vector files. Honestly, this should be turned into classes with inheritence but fuckit
+folder_names = []
+for subdir, dirs, files in os.walk(Vec_Folder):
+    for file in files:
+        (filepath, filename) = os.path.split(file)
+        (shortname, extension) = os.path.splitext(filename)
+        (path, foldername) = os.path.split(subdir)
+        folder_names.append(foldername)
+
+#Empy list containing individual nDSM and Intensity files 
+nDSM = []
+Intensity = []
 Projection = ""
 
 for subdir, dirs, files in os.walk(eCog_Folder):
