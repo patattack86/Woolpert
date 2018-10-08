@@ -21,18 +21,15 @@ tiff_folder = r"B:\Florida-Hydro\nDSM-Destination"
 ground_feature_dataset = "Ground"
 nonground_feature_dataset = "NonGround"
 projection = "2236"
+cellsize = "1"
+path = ""
+
 
 laslist = glob.glob(las_folder + "\\*.las")
 
-l = numpy.array_split(numpy.array(laslist), 10)
+l = numpy.array_split(numpy.array(laslist), 6)
 
-pprint.pprint(list(l[1]))
-
-#Not using anything below this line just yet, probably wont end up using it at all
-#splitting list into 10 smaller list
-#def list_chunks(l, n):
-#    "Use xrange for python2 use range for python 3"
-#    for i in xrange(0, len(l), n):
-#        yield l[i:i + n]
-#
-#pprint.pprint(list(list_chunks(laslist, 50)))
+for index, List in enumerate(l):
+    with open(r"C:\Users\reil\Desktop\nDSM_{}.bat".format(index), 'w') as batch_file:
+        for path in list(List):
+            batch_file.write("python c:\users\reil\source\repos\PythonApplication19\PythonApplication19\create_ndsm.py {} {} {} \n".format(path, projection, cellsize))
