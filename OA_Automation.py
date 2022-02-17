@@ -1,42 +1,54 @@
 import arcpy
 
-
 #where do you want the points to go
-out = r"G:\GS\Projects\Reil_Delivery\oaanalysis\GDOT_Project\4J2\shapefiles\points\4J2_Pointsmerge2"
+out = r"G:\GS\Projects\Reil_Delivery\oaanalysis\GDOT_Project\script_test\points\test_Pointsmerge4.shp"
 
 #where are the points
-arcpy.env.workspace = r"G:\GS\Projects\Reil_Delivery\oaanalysis\GDOT_Project\4J2\shapefiles\points"
+arcpy.env.workspace = r"G:\GS\Projects\Reil_Delivery\oaanalysis\GDOT_Project\Ecog_Shapefiles\points"
 
-#get list of features in folder
+###Define projection
+spatial_reference = arcpy.SpatialReference("NAD 1983 (2011) StatePlane Georgia West FIPS 1002 (US Feet)")
+
+###get list of features in folder
 shplist = arcpy.ListFeatureClasses('*.shp')
 print(shplist)
 
-#merge point shapefiles
+###merge point shapefiles
 arcpy.Merge_management(shplist, out)
+print(out)
 
-#define projection
-spatial_reference = arcpy.SpatialReference("NAD 1983 (2011) StatePlane Georgia West FIPS 1002 (US Feet)")
+###define projection
 arcpy.management.DefineProjection(out, spatial_reference)
+print(out + "projection")
 
-#add xy fields to table
+###add xy fields to table
 arcpy.management.AddXY(out)
+print(out + "_xy")
 
-#create raster variable
-zMax = r"G:\GS\Projects\Reil_Delivery\oaanalysis\GDOT_Project\4J2\Rasters\4J2_zMax.tif"
 
-#where is new shapefile going
-points_values = r"G:\GS\Projects\Reil_Delivery\oaanalysis\GDOT_Project\4J2\shapefiles\points\4j2_values.shp"
+###create raster variable
+zMax = r"G:\GS\Projects\Reil_Delivery\oaanalysis\GDOT_Project\script_test\raster\amg_zmax2.tif"
+print(zMax)
 
-#extrat values to points
-arcpy.sa.ExtractValuesToPoints(out, zMax, points_values, "NONE", "VALUE_ONLY")
+###where is new shapefile going
+points_values = r"G:\GS\Projects\Reil_Delivery\oaanalysis\GDOT_Project\script_test\points\test_values.shp"
 
-#create lat and long fields
-arcpy.management.AddField(out, 'Latitude', TEXT)
-arcpy.management.AddField(out, 'Longitude', TEXT)
-arcpy.management.AddField(out, 'Elevation', FlOAT, 3)
+###extrat values to points
+arcpy.CheckOutExtension("Spatial")
+arcpy.sa.ExtractValuesToPoints(out, zMax, points_values)
+print(points_values + "_done")
 
-#calculate lat and long
-arcpy.management.CalculateGeometryAttributes(points_values, [["Latitude", "Latitude POINT_Y"], ["Longitude", "Longitude POINT_X"]], '', '', None, "DMS_DIR_LAST")
+###create lat and long fields
+arcpy.management.AddField(points_values, 'Latitude', "TEXT")
+arcpy.management.AddField(points_values, 'Longitude', "TEXT")
+arcpy.management.AddField(points_values, 'Elevation', "FlOAT", 3)
+print(points_values + "_addfield")
 
-#final attribute table alteration to get a nice label for z enabled surface
-arcpy.management.CalculateField(points_values, "Elevation", "!RASTERVALU! * 1", "PYTHON3", '', "TEXT", "NO_ENFORCE_DOMAINS")
+###calculate lat and long
+arcpy.management.CalculateGeometryAttributes(points_values, [["Latitude", "POINT_Y"], ["Longitude", "POINT_X"]], '', '', None, "DMS_DIR_LAST")
+print(points_values + "_LatLong")
+
+###final attribute table alteration to get a nice label for z enabled surface
+arcpy.management.CalculateField(points_values, "Elevation", "!RASTERVALU! * 1", "PYTHON3", '', "FLOAT")
+print(points_values + "_CalcField")
+
